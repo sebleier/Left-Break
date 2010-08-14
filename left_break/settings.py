@@ -87,5 +87,4 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'left_break.borders',
     'left_break.buoys',
-    'left_break',
 )
