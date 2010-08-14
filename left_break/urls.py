@@ -4,4 +4,5 @@ from left_break.views import homepage
 
 urlpatterns = patterns('',
     (r'^$', homepage),
+    (r'^borders/', include('borders.urls')),
 )
