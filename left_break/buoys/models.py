@@ -8,4 +8,4 @@ class Buoy(models.Model):
     objects = models.GeoManager()
 
     def __unicode__(self):
-        return u"<Buoy %s" % self.name
+        return u"<Buoy %s>" % self.name
