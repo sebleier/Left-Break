@@ -1,4 +1,4 @@
-# Django settings for left_break project.
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -76,7 +76,8 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'left_break.urls'
 
-TEMPLATE_DIRS = ()
+template_path = os.path.join(os.path.dirname(__file__), "templates")
+TEMPLATE_DIRS = (template_path,)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
