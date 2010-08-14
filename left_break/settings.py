@@ -88,3 +88,6 @@ INSTALLED_APPS = (
     'left_break.borders',
     'left_break.buoys',
 )
+
+CACHE_BACKEND = 'locmem://'
+
