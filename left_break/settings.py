@@ -85,4 +85,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
+    'left_break.borders',
+    'left_break.buoys',
 )
