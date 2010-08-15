@@ -1,3 +1,4 @@
+from django.contrib.gis.geos import Polygon
 from left_break.decorators import json_view
 from left_break.buoys.models import Buoy
 
