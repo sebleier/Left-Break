@@ -19,6 +19,7 @@
 
         // Get border data
         $.getJSON("/borders/", function(data) {
+            var lines = []
             // Boundaries
             for(var i = 0; i < data.length; i++) {
                 var points = [];
@@ -27,13 +28,13 @@
                     point = new google.maps.LatLng(data[i][j][1], data[i][j][0]);
                     points.push(point);
                 }
-                var line = new google.maps.Polyline({
+                lines.push(new google.maps.Polyline({
                     'path': points,
                     'strokeColor': '#0000ff',
                     'strokeWeight': 1,
                     'strokeOpacity': .9,
                     'map': map
-                });
+                }));
             }
         });
      }

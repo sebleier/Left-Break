@@ -14,3 +14,12 @@ class StateBorder(models.Model):
     geom = models.PolygonField(srid=4326)
 
     objects = models.GeoManager()
+
+class Coastline(models.Model):
+    state = models.CharField(max_length=20)
+    geom = models.LineStringField(srid=4326)
+
+    objects = models.GeoManager()
+
+    def __unicode__(self):
+        return u"%s" % self.state
