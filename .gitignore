@@ -1,3 +1,4 @@
 *.py[c|o]
 *.tar.gz
 *.spec
+*.bull
