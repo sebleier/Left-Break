@@ -2,6 +2,76 @@
 {% block scripts %}
 {{ block.super }}
 <script type="text/javascript">
+    // Canvas Overlay Class
+    CanvasOverlay.prototype = new google.maps.OverlayView();
+    function CanvasOverlay(opts) {
+        this.opts = opts;
+        this._width = opts.width;
+        this._height = opts.height;
+        this._map = opts.map;
+        this._id = opts.id;
+        this._point = opts.point
+        google.maps.OverlayView.call(this);
+        this.setMap(this._map);
+        this.__init__();
+    }
+
+    CanvasOverlay.prototype.__init__ = function() {}
+
+    CanvasOverlay.prototype.createElement = function() {
+        if (!this._canvas) {
+            var panes = this.getPanes();
+            canvas = document.createElement("canvas");
+            canvas.style.position = "absolute";
+            canvas.setAttribute('id', this._id);
+            canvas.setAttribute('height', this._height);
+            canvas.setAttribute('width', this._width);
+            this._canvas = canvas;
+            this._ctx = this._canvas.getContext('2d');
+            this.lastZoom_ = -1;
+            panes.overlayLayer.appendChild(canvas);
+        }
+    }
+
+    CanvasOverlay.prototype.remove = function() {
+        if (this._canvas) {
+            this.setMap(null);
+            this._canvas.parentNode.removeChild(this._canvas);
+            this._canvas = null;
+            this._ctx = null;
+        }
+    }
+
+    CanvasOverlay.prototype.draw = function(firstTime) {
+        this.createElement();
+        // If there's no canvas or the current zoom equals the last zoom, then return
+        if (!this._canvas || this._lastZoom == this._map.getZoom()) {
+            return;
+        }
+        // Position canvas
+        var point = this.get('projection').fromLatLngToDivPixel(this._point);
+        if (!point) return;
+        this._canvas.style.left = point.x + "px";
+        this._canvas.style.top = point.y + "px";
+        this._lastZoom = this._map.getZoom() ;
+        // Use render hook to do the actual drawing
+        this.render();
+    }
+
+    CanvasOverlay.prototype.render = function() {
+        this._ctx.strokeStyle = "rgba(255,0,0,1)";
+        this._ctx.fillStyle = "rgba(255,0,0,.5)";
+        this._ctx.beginPath();
+        this._ctx.arc(4, 4, 3, 0.0, Math.PI*2, true);
+        this._ctx.closePath();
+        this._ctx.fill();
+    }
+
+    CanvasOverlay.prototype.clear = function() {
+        this._ctx.clearRect(0,0,this._width, this._height)
+    }
+</script>
+<script type="text/javascript">
      function initialize() {
         point = new google.maps.LatLng(35.140897, -120.646306);
         var myOptions = {
