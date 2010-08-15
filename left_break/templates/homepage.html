@@ -37,6 +37,17 @@
                 }));
             }
         });
+
+        // Get Buoy data
+        $.getJSON("/buoys/", function(data) {
+            for (var i = 0; i < data.length; i++) {
+                point = new google.maps.LatLng(data[i].coords[1], data[i].coords[0]);
+                // render
+
+            }
+            point = new google.maps.LatLng(35.140897, -120.646306);
+        });
+
      }
 </script>
 {% endblock %}
