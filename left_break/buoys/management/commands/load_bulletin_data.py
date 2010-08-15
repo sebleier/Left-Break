@@ -87,6 +87,8 @@ class Command(NoArgsCommand):
             ftp.cwd("..")
             for filename in filenames.lines:
                 if filename.split(".")[-1] == "bull":
+                    if os.path.isfile(os.path.join(folder, filename)):
+                        continue
                     try:
                         buoy = Buoy.objects.get(name=filename.split(".")[-2])
                     except Buoy.DoesNotExist:
