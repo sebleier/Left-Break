@@ -112,8 +112,13 @@
         $.getJSON("/buoys/", function(data) {
             for (var i = 0; i < data.length; i++) {
                 point = new google.maps.LatLng(data[i].coords[1], data[i].coords[0]);
-                // render
-
+                var ov = new CanvasOverlay({
+                    point: point,
+                    map: map,
+                    id: "buoy_"+data[i].id,
+                    height: 7,
+                    width: 7
+                });
             }
             point = new google.maps.LatLng(35.140897, -120.646306);
         });
