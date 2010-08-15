@@ -2,21 +2,27 @@
 {% block scripts %}
 {{ block.super }}
 <script type="text/javascript">
+    var log;
+    if (typeof(console) == "undefined") {
+        log = function() {};
+    } else {
+        log = console.log;
+    }
+
     // Canvas Overlay Class
     CanvasOverlay.prototype = new google.maps.OverlayView();
     function CanvasOverlay(opts) {
-        this.opts = opts;
-        this._width = opts.width;
-        this._height = opts.height;
-        this._map = opts.map;
-        this._id = opts.id;
-        this._point = opts.point
-        google.maps.OverlayView.call(this);
-        this.setMap(this._map);
-        this.__init__();
+        if (opts) {
+            this.opts = opts;
+            this._width = opts.width;
+            this._height = opts.height;
+            this._map = opts.map;
+            this._id = opts.id;
+            this._point = opts.point
+            google.maps.OverlayView.call(this);
+            this.setMap(this._map);
+        }
     }
-
-    CanvasOverlay.prototype.__init__ = function() {}
 
     CanvasOverlay.prototype.createElement = function() {
         if (!this._canvas) {
@@ -72,6 +78,35 @@
     }
 </script>
 <script type="text/javascript">
+    // Canvas Overlay Class
+    VectorOverlay.prototype = new CanvasOverlay();
+    VectorOverlay.prototype.constructor = VectorOverlay
+    function VectorOverlay(opts) {
+        if (opts) {
+            this.opts = opts;
+            this._width = opts.width;
+            this._height = opts.height;
+            this._map = opts.map;
+            this._id = opts.id;
+            this._point = opts.point
+            google.maps.OverlayView.call(this);
+            this.setMap(this._map);
+            this._magnitude = opts.magnitude;
+            this._direction = opts.direction;
+        }
+    }
+
+    VectorOverlay.prototype.render = function() {
+        this._ctx.strokeStyle = "rgba(255,0,0,1)";
+        this._ctx.fillStyle = "rgba(255,0,0,.5)";
+        this._ctx.beginPath();
+        this._ctx.arc(4, 4, 3, 0.0, Math.PI*2, true);
+        this._ctx.closePath();
+        this._ctx.fill();
+    }
+</script>
+
+<script type="text/javascript">
      function initialize() {
         point = new google.maps.LatLng(35.140897, -120.646306);
         var myOptions = {
@@ -112,7 +147,7 @@
         $.getJSON("/buoys/", function(data) {
             for (var i = 0; i < data.length; i++) {
                 point = new google.maps.LatLng(data[i].coords[1], data[i].coords[0]);
-                var ov = new CanvasOverlay({
+                var ov = new VectorOverlay({
                     point: point,
                     map: map,
                     id: "buoy_"+data[i].id,
