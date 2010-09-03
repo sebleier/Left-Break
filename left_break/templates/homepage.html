@@ -2,11 +2,36 @@
 {% block scripts %}
 {{ block.super }}
 <script type="text/javascript">
+    var sin = Math.sin;
+    var cos = Math.cos;
+    var tan = Math.tan;
+    var atan = Math.atan;
+    var pow = Math.pow;
+    var random = Math.random;
+    var round = Math.round;
+    var ceil = Math.ceil;
+    var floor = Math.floor;
     var log;
+    var PI = Math.PI
     if (typeof(console) == "undefined") {
         log = function() {};
     } else {
         log = console.log;
+    }
+    function radians(degree) {
+        return degree * PI / 180;
+    }
+
+    function degrees(radians) {
+        return radians * 180 / PI;
+    }
+
+
+    function round(num, digits) {
+        if (!digits) {
+            digits = 0;
+        }
+        return round(num * pow(10, digits)) / pow(10, digits);
     }
 
     // Canvas Overlay Class
@@ -57,8 +82,8 @@
         // Position canvas
         var point = this.get('projection').fromLatLngToDivPixel(this._point);
         if (!point) return;
-        this._canvas.style.left = point.x + "px";
-        this._canvas.style.top = point.y + "px";
+        this._canvas.style.left = (point.x - this._width/2) + "px";
+        this._canvas.style.top = (point.y - this._height/2) + "px";
         this._lastZoom = this._map.getZoom() ;
         // Use render hook to do the actual drawing
         this.render();
@@ -68,7 +93,7 @@
         this._ctx.strokeStyle = "rgba(255,0,0,1)";
         this._ctx.fillStyle = "rgba(255,0,0,.5)";
         this._ctx.beginPath();
-        this._ctx.arc(4, 4, 3, 0.0, Math.PI*2, true);
+        this._ctx.arc(4, 4, 3, 0.0, PI*2, true);
         this._ctx.closePath();
         this._ctx.fill();
     }
@@ -93,16 +118,64 @@
             this.setMap(this._map);
             this._magnitude = opts.magnitude;
             this._direction = opts.direction;
+            this._intensity = opts.intensity;
         }
     }
 
     VectorOverlay.prototype.render = function() {
-        this._ctx.strokeStyle = "rgba(255,0,0,1)";
-        this._ctx.fillStyle = "rgba(255,0,0,.5)";
+        this._ctx.strokeStyle = "rgba(0,0,0,1)";
+        this._ctx.fillStyle = "rgba(0,0,0,.5)";
         this._ctx.beginPath();
-        this._ctx.arc(4, 4, 3, 0.0, Math.PI*2, true);
+        this._ctx.arc(this._width/2, this._height/2, 2, 0.0, PI*2, true);
         this._ctx.closePath();
         this._ctx.fill();
+
+        var states = [
+            [1, 0, -1],
+            [1, -1, 0],
+            [0, -1, 1],
+            [-1, 0, 1],
+            [-1, 1, 0],
+            [0, 1, -1],
+            [1, 0, -1]
+        ]
+        var i = floor(round(768 + this._intensity * 767) / 256);
+        var r = round(768 + this._intensity * 767) % 256;
+
+        var red = states[i+1][0] == 1 ? 255 : states[i+1][0] == -1 ? 0 : (states[i][0] > 0 ? 255 - r : r);
+        var green = states[i+1][1] == 1 ? 255 : states[i+1][1] == -1 ? 0 : (states[i][1] > 0 ? 255 - r : r);
+        var blue = states[i+1][2] == 1 ? 255 : states[i+1][2] == -1 ? 0 : (states[i][2] > 0 ? 255 - r : r);
+        var color = "rgba("+red+","+green+","+blue+", 1)";
+        this._ctx.strokeStyle = color;
+        this._ctx.beginPath();
+
+        var length = 15 + this._magnitude / 2;
+        var side_length = 7;
+        theta = this._direction;
+        center = {
+            x: this._width / 2,
+            y: this._height / 2
+        }
+        start = {
+            x: center.x - length/2 * sin(radians(theta)),
+            y: center.y + length/2 * cos(radians(theta))
+        }
+        end = {
+            x: center.x + length/2 * sin(radians(theta)),
+            y: center.y - length/2 * cos(radians(theta))
+        }
+        this._ctx.moveTo(start.x, start.y);
+        this._ctx.lineTo(end.x, end.y);
+        this._ctx.lineTo(
+            end.x - side_length * sin(radians(theta + 45)),
+            end.y + side_length * cos(radians(theta + 45))
+        )
+        this._ctx.moveTo(end.x, end.y);
+        this._ctx.lineTo(
+            end.x - side_length * sin(radians(theta - 45)),
+            end.y + side_length * cos(radians(theta - 45))
+        )
+        this._ctx.stroke();
     }
 </script>
 
@@ -151,8 +224,11 @@
                     point: point,
                     map: map,
                     id: "buoy_"+data[i].id,
-                    height: 7,
-                    width: 7
+                    height: 100,
+                    width: 100,
+                    magnitude: round(random() * 30),
+                    direction: round(360 * random()),
+                    intensity: random()
                 });
             }
             point = new google.maps.LatLng(35.140897, -120.646306);
